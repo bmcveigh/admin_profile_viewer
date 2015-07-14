@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * @file
+ * This file is the main file for viewing a list of profile2 profiles.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function admin_profile_viewer_menu() {
+  $items = array();
+
+  $items['admin/workbench/profile-viewer'] = array(
+    'title' => 'User Profile List',
+    'page callback' => 'admin_profile_viewer_page',
+    'access arguments' => array('access administration menu'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Page callback to view the links of the user profiles.
+ */
+function admin_profile_viewer_page() {
+
+  $query = db_select('users', 'u')->fields('u')->execute();
+  $result = $query->fetchAll();
+
+  $header = array('uid', 'Name', 'Timezone', 'Email');
+  
+  $rows = array();
+
+  foreach ($result as $r) {
+  	$link = l($r->uid, t('profile-main/@user_id', array('@user_id' => $r->uid)));
+  	$rows[] = array($link, $r->name, $r->timezone, $r->init);
+  }
+
+  return theme('table', array('header' => $header, 'rows' => $rows));
+}
